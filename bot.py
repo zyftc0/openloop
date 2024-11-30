@@ -6,9 +6,13 @@ import os
 from colorama import Fore, Style, init
 import urllib3
 
+# Initialize colorama for Windows
 init()
+
+# Disable SSL warnings
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+# ANSI escape sequences for colors
 class Colors:
     GREEN = Fore.GREEN
     YELLOW = Fore.YELLOW
@@ -84,12 +88,12 @@ async def share_bandwidth(token, proxy):
             logger(f"意外的响应格式: {data}", 'warning')
 
     except requests.RequestException as e:
-        logger(f"分享带宽时出错，请尝试不使用代理，如不使用代理成功分享，请更换你的代理ip: {e}", 'error')
+        logger(f"分享带宽时出错，请尝试不使用代理，如不使用代理成功，请更换你的代理ip: {e}", 'error')
 
 async def share_bandwidth_for_all_tokens(proxies=None):
     tokens = get_tokens()
     if not proxies:
-        proxies = get_proxies()
+        proxies = get_proxies()  # Fetch proxies if none were provided
 
     if len(tokens) != len(proxies) and len(proxies) > 0:
         logger("Token 和代理数量不匹配!", 'error')
@@ -120,7 +124,7 @@ def login_user(email, password, use_proxy=True):
         login_payload = {'username': email, 'password': password}
         proxies = None
         if use_proxy:
-            proxies = use_proxy(0)
+            proxies = use_proxy(0)  # Here we assume we want the first proxy if any
 
         login_response = requests.post('https://api.openloop.so/users/login',
                                        headers={'Content-Type': 'application/json'},
@@ -135,7 +139,7 @@ def login_user(email, password, use_proxy=True):
         access_token = login_data.get('data', {}).get('accessToken', '')
         if access_token:
             logger('登录成功，获取到 Token:', 'success', access_token)
-            with open('token.txt', 'a'):
+            with open('token.txt', 'a') as token_file:  # Use 'a' for append mode
                 token_file.write(f"{access_token}\n")
             logger('访问令牌已保存到 token.txt')
         else:
@@ -157,6 +161,7 @@ def register_user():
         else:
             logger('不使用代理进行注册。')
 
+        # Default invite code, can be overridden by user input
         default_invite_code = 'ole2681909'
 
         for email, password in accounts:
@@ -208,7 +213,7 @@ def main_menu():
             loop.run_until_complete(share_bandwidth_for_all_tokens(proxies))
 
             while True:
-                time.sleep(60)
+                time.sleep(60)  # 等待一分钟
                 loop.run_until_complete(share_bandwidth_for_all_tokens(proxies))
 
         elif choice == '2':
