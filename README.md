@@ -43,6 +43,7 @@
    python bot.py 或 python3 bot.py
    ```
 **运行后选择2注册或获取Token 注意！要把你需要注册或者登录的账号密码写入accounts.txt内 格式为example1@email.com,password1**
+
 4. 运行脚本安装节点：
    ```bash
    python bot.py 或 python3 bot.py
