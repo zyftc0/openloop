@@ -5,14 +5,11 @@ import time
 import os
 from colorama import Fore, Style, init
 import urllib3
+import asyncio
 
-# Initialize colorama for Windows
 init()
-
-# Disable SSL warnings
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# ANSI escape sequences for colors
 class Colors:
     GREEN = Fore.GREEN
     YELLOW = Fore.YELLOW
@@ -64,7 +61,7 @@ def get_tokens():
     with open('token.txt', 'r') as file:
         return [line.strip() for line in file if line.strip()]
 
-async def share_bandwidth(token, proxy):
+async def share_bandwidth(token, proxy=None):
     try:
         quality = get_random_quality()
         proxies = {'https': f'http://{proxy}'} if proxy else None
@@ -88,29 +85,14 @@ async def share_bandwidth(token, proxy):
             logger(f"意外的响应格式: {data}", 'warning')
 
     except requests.RequestException as e:
-        logger(f"分享带宽时出错，请尝试不使用代理，如不使用代理成功，请更换你的代理ip: {e}", 'error')
+        logger(f"分享带宽时出错: {e}", 'error')
 
 async def share_bandwidth_for_all_tokens(proxies=None):
     tokens = get_tokens()
-    if not proxies:
-        proxies = get_proxies()  # Fetch proxies if none were provided
-
-    if len(tokens) != len(proxies) and len(proxies) > 0:
-        logger("Token 和代理数量不匹配!", 'error')
-        return
-
     for index, token in enumerate(tokens):
-        proxy = proxies[index] if index < len(proxies) else None
+        proxy = proxies[index] if proxies and index < len(proxies) else None
         logger(f"正在为第 {index + 1} 个账号分享带宽...", 'info')
         await share_bandwidth(token, proxy)
-
-def use_proxy(proxy_index):
-    proxies = get_proxies()
-    if proxies:
-        return {'https': f'http://{proxies[proxy_index % len(proxies)]}'}
-    else:
-        logger("没有可用的代理，将不使用代理。", 'warn')
-        return None
 
 def get_account_info():
     if not os.path.exists('accounts.txt'):
@@ -122,9 +104,7 @@ def get_account_info():
 def login_user(email, password, use_proxy=True):
     try:
         login_payload = {'username': email, 'password': password}
-        proxies = None
-        if use_proxy:
-            proxies = use_proxy(0)  # Here we assume we want the first proxy if any
+        proxies = None if not use_proxy else {'https': f'http://{get_proxies()[0]}'}
 
         login_response = requests.post('https://api.openloop.so/users/login',
                                        headers={'Content-Type': 'application/json'},
@@ -139,7 +119,7 @@ def login_user(email, password, use_proxy=True):
         access_token = login_data.get('data', {}).get('accessToken', '')
         if access_token:
             logger('登录成功，获取到 Token:', 'success', access_token)
-            with open('token.txt', 'a') as token_file:  # Use 'a' for append mode
+            with open('token.txt', 'a') as token_file:
                 token_file.write(f"{access_token}\n")
             logger('访问令牌已保存到 token.txt')
         else:
@@ -150,27 +130,16 @@ def login_user(email, password, use_proxy=True):
 def register_user():
     try:
         accounts = get_account_info()
-
         if not accounts:
             logger("账户信息文件 accounts.txt 为空!", 'error')
             return
 
         use_proxy_choice = ask_question('是否使用代理进行注册？(y/n): ').lower()
-        if use_proxy_choice == 'y':
-            logger('使用代理进行注册。')
-        else:
-            logger('不使用代理进行注册。')
-
-        # Default invite code, can be overridden by user input
-        default_invite_code = 'ole2681909'
+        invite_code = ask_question('请输入您的邀请码（所有账户将使用这个邀请码）: ')
 
         for email, password in accounts:
-            invite_code = ask_question(f'请为 {email} 输入您的邀请码，如果没有可以用我的 {default_invite_code}: ')
-            if not invite_code:
-                invite_code = default_invite_code
-
             registration_payload = {'name': email, 'username': email, 'password': password, 'inviteCode': invite_code}
-            proxies = use_proxy(0) if use_proxy_choice == 'y' else None
+            proxies = {'https': f'http://{get_proxies()[0]}'} if use_proxy_choice == 'y' else None
 
             try:
                 register_response = requests.post('https://api.openloop.so/users/register',
@@ -208,12 +177,11 @@ def main_menu():
                 logger("没有可用的代理，将不使用代理。", 'warn')
 
             logger('开始分享带宽...')
-            import asyncio
             loop = asyncio.get_event_loop()
             loop.run_until_complete(share_bandwidth_for_all_tokens(proxies))
 
             while True:
-                time.sleep(60)  # 等待一分钟
+                time.sleep(60)
                 loop.run_until_complete(share_bandwidth_for_all_tokens(proxies))
 
         elif choice == '2':
