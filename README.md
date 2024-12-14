@@ -1,4 +1,4 @@
-## OpenLoop脚本
+## OpenLoop脚本 我的邀请码ole268190
 
 ![微信截图_20241130162931](https://github.com/user-attachments/assets/20a509e2-a1ed-44c1-a6ae-28ea829b2808)
 
