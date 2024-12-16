@@ -1,5 +1,5 @@
 ## OpenLoop脚本 我的邀请码 ol5bf64a50
-fork from 糕子哥，修复了原脚本的一些问题！～～
+fork from 糕子哥，修复了原脚本的一些问题！～～ python 3.10版本，3.11以上会报废弃bug
 ![微信截图_20241130162931](https://github.com/user-attachments/assets/20a509e2-a1ed-44c1-a6ae-28ea829b2808)
 
 ## OpenLoop Network 是一个去中心化的无线网络，旨在增强互联网服务的交付，使其更高效、可访问性更强，并为每个人带来更多回报。
