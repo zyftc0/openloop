@@ -24,7 +24,7 @@
 
 如果你已经有账户，请把账号密码以格式为`example1@email.com,password1`的方式放入`accounts.txt`
 
-将你的代理放入`proxy.txt`文件中，格式为`http://username:pass@ip:port`
+将你的代理放入`proxy.txt`文件中，格式为<span style="color: red;">~~http://~~</span>`username:pass@ip:port`
 
 
 ## 设置

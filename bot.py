@@ -19,16 +19,6 @@ class Colors:
     WHITE = Fore.WHITE
     RESET = Style.RESET_ALL
 
-banner = """
-               ╔═╗╔═╦╗─╔╦═══╦═══╦═══╦═══╗
-               ╚╗╚╝╔╣║─║║╔══╣╔═╗║╔═╗║╔═╗║
-               ─╚╗╔╝║║─║║╚══╣║─╚╣║─║║║─║║
-               ─╔╝╚╗║║─║║╔══╣║╔═╣╚═╝║║─║║
-               ╔╝╔╗╚╣╚═╝║╚══╣╚╩═║╔═╗║╚═╝║
-               ╚═╝╚═╩═══╩═══╩═══╩╝─╚╩═══╝
-               我的gihub：github.com/Gzgod
-               我的推特：推特雪糕战神@Hy78516012                   """
-
 def logger(message, level='info', value=""):
     now = time.strftime('%Y-%m-%dT%H:%M:%S')
     colors = {
@@ -127,6 +117,21 @@ def login_user(email, password, use_proxy=True):
     except requests.RequestException as e:
         logger('登录过程中出错:', 'error', e)
 
+def login_user_main():
+    try:
+        accounts = get_account_info()
+        if not accounts:
+            logger("账户信息文件 accounts.txt 为空!", 'error')
+            return
+
+        use_proxy_choice = ask_question('是否使用代理？(y/n): ').lower()
+
+        for email, password in accounts:
+            login_user(email, password, use_proxy_choice == 'y')
+
+    except requests.RequestException as e:
+        logger('登录过程中出错:', 'error', e)
+
 def register_user():
     try:
         accounts = get_account_info()
@@ -164,11 +169,11 @@ def register_user():
 
 def main_menu():
     while True:
-        print(Colors.MAGENTA + banner + Colors.RESET)
         print(f"{Colors.YELLOW}1. 启动节点")
         print(f"2. 注册或获取Token")
-        print(f"3. 退出")
-        choice = ask_question(f"{Colors.WHITE}请选择 (1, 2, 或 3): {Colors.RESET}")
+        print(f"3. 获取Token")
+        print(f"4. 退出")
+        choice = ask_question(f"{Colors.WHITE}请选择 (1, 2, 3 或 4...): {Colors.RESET}")
 
         if choice == '1':
             use_proxy_choice = ask_question('是否使用代理启动节点？(y/n): ').lower()
@@ -178,6 +183,7 @@ def main_menu():
 
             logger('开始分享带宽...')
             loop = asyncio.get_event_loop()
+            logger('1111')
             loop.run_until_complete(share_bandwidth_for_all_tokens(proxies))
 
             while True:
@@ -187,6 +193,8 @@ def main_menu():
         elif choice == '2':
             register_user()
         elif choice == '3':
+            login_user_main()
+        elif choice == '4':
             logger('退出应用程序...')
             break
         else:
