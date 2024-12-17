@@ -24,14 +24,14 @@ fork from 糕子哥，修复了原脚本的一些问题！～～ python 3.10版�
 
 如果你已经有账户，请把账号密码以格式为`example1@email.com,password1`的方式放入`accounts.txt`
 
-将你的代理放入`proxy.txt`文件中，格式为<span style="color: red;">~~http://~~</span>`username:pass@ip:port`
+将你的代理放入`proxy.txt`文件中，格式为`username:pass@ip:port` (http协议)
 
 
 ## 设置
 
 1. 克隆此仓库：
    ```bash
-   git clone https://github.com/Gzgod/openloop.git
+   git clone https://github.com/zyftc0/openloop.git
    cd openloop
    ```
 2. 安装依赖：
