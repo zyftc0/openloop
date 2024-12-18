@@ -81,7 +81,7 @@ async def share_bandwidth_for_all_tokens(proxies=None):
     tokens = get_tokens()
     for index, token in enumerate(tokens):
         proxy = proxies[index] if proxies and index < len(proxies) else None
-        logger(f"正在为第 {index + 1} 个账号分享带宽...", 'info')
+        logger(f"正在为第 {index + 1} 个账号分享带宽, 代理: {proxy}...", 'info')
         await share_bandwidth(token, proxy)
 
 def get_account_info():
@@ -108,14 +108,14 @@ def login_user(email, password, use_proxy=True):
         login_data = login_response.json()
         access_token = login_data.get('data', {}).get('accessToken', '')
         if access_token:
-            logger('登录成功，获取到 Token:', 'success', access_token)
+            logger("{email}登录成功，获取到 Token:", 'success', access_token)
             with open('token.txt', 'a') as token_file:
                 token_file.write(f"{access_token}\n")
             logger('访问令牌已保存到 token.txt')
         else:
             logger('从登录响应中提取访问令牌失败。', 'error')
     except requests.RequestException as e:
-        logger('登录过程中出错:', 'error', e)
+        logger("{email}登录过程中出错:", 'error', e)
 
 def login_user_main():
     try:
@@ -183,11 +183,10 @@ def main_menu():
 
             logger('开始分享带宽...')
             loop = asyncio.get_event_loop()
-            logger('1111')
             loop.run_until_complete(share_bandwidth_for_all_tokens(proxies))
 
             while True:
-                time.sleep(60)
+                time.sleep(200)
                 loop.run_until_complete(share_bandwidth_for_all_tokens(proxies))
 
         elif choice == '2':
